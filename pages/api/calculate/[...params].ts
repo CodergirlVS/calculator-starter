@@ -1,6 +1,7 @@
 import { add, subtract, multiply, divide } from "../../../utils/calculate";
+import { NextApiRequest, NextApiResponse } from "next";
 
-export default function handler(req, res) {
+export default function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     if (req.method !== "GET") {
       throw new Error(
@@ -28,11 +29,12 @@ export default function handler(req, res) {
     }
     res.status(200).json({ result });
   } catch (e) {
+
     res.status(500).json({ message: e.message });
   }
 }
 
-function extractParams(queryParams) {
+function extractParams(queryParams: string[] | string | undefined) {
   if (queryParams.length !== 3) {
     throw new Error(
       `Query params should have 3 items. Received ${queryParams.length}: ${queryParams}`
@@ -45,6 +47,12 @@ function extractParams(queryParams) {
       first: parseInt(queryParams[1]),
       second: parseInt(queryParams[2]),
     };
+
+    if(isNaN(params.first) || isNaN(params.second)) {
+      throw new Error(
+        `Query params "first" and "Second" both should be numbers. Received: ${queryParams}`
+      )
+    }
     return params;
   } catch (e) {
     throw new Error(`Failed to process query params. Received: ${queryParams}`);
