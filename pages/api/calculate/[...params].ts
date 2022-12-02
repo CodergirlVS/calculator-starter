@@ -9,13 +9,8 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       );
     }
 
-    interface ExtractedParams {
-      first: number;
-      second: Number;
-    }
+    const params = extractParams(req.query.params);
 
-    const params = extractParams(req.query.params: ExtractedParams);
-    
     let result;
     switch (params.operation) {
       case "add":
@@ -42,29 +37,47 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     res.status(500).json({ message: errMsg });
   }
 }
+interface QueryParam {
+    operation: string,
+    first: number,
+    second: number,
+}
 
-function extractParams(queryParams: string[] | string) {
-  if (queryParams.length !== 3) {
+type QueryArray = string[] | string | undefined;
+
+function extractParams(queryArray: QueryArray) {
+  if(!queryArray) {
     throw new Error(
-      `Query params should have 3 items. Received ${queryParams.length}: ${queryParams}`
+      `Query params should be a String Array*. Received: ${queryArray}`
+    );
+  }
+if(typeof queryArray === 'string') {
+  throw new Error(
+    `Query params should be a String Array. Received ${queryArray}`
+  );
+}
+
+  if (queryArray?.length !== 3) {
+    throw new Error(
+      `Query params should have 3 items. Received ${queryArray?.length}: ${queryArray}`
     );
   }
 
   try {
-    const params = {
-      operation: queryParams[0],
-      first: parseInt(queryParams[1]),
-      second: parseInt(queryParams[2]),
+    const params: QueryParam = {
+      operation: queryArray[0],
+      first: parseInt(queryArray[1]),
+      second: parseInt(queryArray[2]),
     };
 
     if(isNaN(params.first) || isNaN(params.second)) {
       throw new Error(
-        `Query params "first" and "Second" both should be numbers. Received: ${queryParams}`
+        `Query params "first" and "Second" both should be numbers. Received: ${params}`
       )
     }
     return params;
   } catch (e) {
-    throw new Error(`Failed to process query params. Received: ${queryParams}`);
+    throw new Error(`Failed to process query params. Received: ${queryArray}`);
   }
 }
 
