@@ -13,22 +13,31 @@ import {
 import { OutlinedInput } from "@mui/material";
 import axios from "axios";
 
-import { useState } from "react";
+import {
+  useState,
+  ChangeEvent,
+  FormEvent,
+  useRef,
+} from "react";
 
 const Calculator = () => {
   const [operation, setOperation] = useState("");
   const [result, setResult] = useState("");
+  const first = useRef<HTMLInputElement>(null);
+  const second = useRef<HTMLInputElement>(null);
 
-  const handleChange = (e) => {
+  const handleChange = (
+    e: ChangeEvent<HTMLSelectElement>
+  ) => {
     setOperation(e.target.value);
   };
 
-  const handleCalculate = (e) => {
+  const handleCalculate = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const query = {
       operation: operation,
-      first: e.target.first.value,
-      second: e.target.second.value,
+      first: first.current?.value,
+      second: second.current?.value,
     };
 
     axios
@@ -46,7 +55,12 @@ const Calculator = () => {
       <Grid2 container spacing={1}>
         <Grid2 xs={5}>
           <FormControl fullWidth>
-            <TextField id="first" label="First Number" variant="outlined" />
+            <TextField
+              id="first"
+              label="First Number"
+              variant="outlined"
+              inputRef={first}
+            />
           </FormControl>
         </Grid2>
         <Grid2 xs={2}>
@@ -70,7 +84,12 @@ const Calculator = () => {
         </Grid2>
         <Grid2 xs={5}>
           <FormControl fullWidth>
-            <TextField id="second" label="Second Number" variant="outlined" />
+            <TextField
+              id="second"
+              label="Second Number"
+              variant="outlined"
+              inputRef={second}
+            />
           </FormControl>
         </Grid2>
         <Grid2 xs={12}>
@@ -97,4 +116,3 @@ const Calculator = () => {
   );
 };
 export default Calculator;
-

@@ -9,7 +9,13 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       );
     }
 
-    const params = extractParams(req.query.params);
+    interface ExtractedParams {
+      first: number;
+      second: Number;
+    }
+
+    const params = extractParams(req.query.params: ExtractedParams);
+    
     let result;
     switch (params.operation) {
       case "add":
@@ -29,12 +35,15 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     }
     res.status(200).json({ result });
   } catch (e) {
-
-    res.status(500).json({ message: e.message });
+    let errMsg = "undefined";
+    if (e instanceof Error) {
+      errMsg = e.message
+    }
+    res.status(500).json({ message: errMsg });
   }
 }
 
-function extractParams(queryParams: string[] | string | undefined) {
+function extractParams(queryParams: string[] | string) {
   if (queryParams.length !== 3) {
     throw new Error(
       `Query params should have 3 items. Received ${queryParams.length}: ${queryParams}`
