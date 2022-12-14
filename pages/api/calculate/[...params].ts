@@ -45,15 +45,15 @@ interface QueryParam {
 
 type QueryArray = string[] | string | undefined;
 
-function extractParams(queryArray: QueryArray) {
+function extractParams(queryArray: QueryArray): QueryParam{
   if(!queryArray) {
     throw new Error(
-      `Query params should be a String Array*. Received: ${queryArray}`
+      `Query params should be an Array of String*. Received: ${queryArray}`
     );
   }
 if(typeof queryArray === 'string') {
   throw new Error(
-    `Query params should be a String Array. Received ${queryArray}`
+    `Query params should be an Array of String. Received ${queryArray}`
   );
 }
 
@@ -64,7 +64,7 @@ if(typeof queryArray === 'string') {
   }
 
   try {
-    const params: QueryParam = {
+    const params={
       operation: queryArray[0],
       first: parseInt(queryArray[1]),
       second: parseInt(queryArray[2]),
