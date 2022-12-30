@@ -105,7 +105,7 @@ const Calculator = () => {
         <Grid2 xs={12}>
           <Box>
             <Paper>
-              <Typography align="center" variant="h3" gutterBottom>
+              <Typography align="center" variant="h3" gutterBottom id="result">
                 {result}
               </Typography>
             </Paper>

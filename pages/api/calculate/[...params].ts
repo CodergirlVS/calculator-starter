@@ -9,6 +9,10 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       );
     }
 
+    if (!Array.isArray(req.query.params)) {
+      throw new Error(`Expected multiple params. got: ${req.query.params}`);
+    }
+
     const params = extractParams(req.query.params);
 
     let result;
@@ -51,16 +55,17 @@ function extractParams(queryArray: QueryArray): QueryParam{
       `Query params should be an Array of String*. Received: ${queryArray}`
     );
   }
-if(typeof queryArray === 'string') {
-  throw new Error(
-    `Query params should be an Array of String. Received ${queryArray}`
-  );
-}
 
   if (queryArray?.length !== 3) {
     throw new Error(
       `Query params should have 3 items. Received ${queryArray?.length}: ${queryArray}`
     );
+  }
+
+  if(isNaN(parseInt(queryArray[1])) || isNaN(parseInt(queryArray[2]))) {
+    throw new Error(
+      `Query params "first" and "Second" both should be numbers. Received: ${queryArray}`
+    )
   }
 
   try {
@@ -69,12 +74,6 @@ if(typeof queryArray === 'string') {
       first: parseInt(queryArray[1]),
       second: parseInt(queryArray[2]),
     };
-
-    if(isNaN(params.first) || isNaN(params.second)) {
-      throw new Error(
-        `Query params "first" and "Second" both should be numbers. Received: ${params}`
-      )
-    }
     return params;
   } catch (e) {
     throw new Error(`Failed to process query params. Received: ${queryArray}`);
