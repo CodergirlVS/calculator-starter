@@ -46,10 +46,10 @@ describe("test calculate API handler", () => {
   it("should only accept GET method", () => {
     const { req, res } = getMockHttpObjs("GET", { params: ["add", 1, "a"] });
     handler(req, res);
-    
+
     expect(res.statusCode).toBe(500);
     expect(res._getJSONData()).toEqual({
-        message: `Query params "first" and "Second" both should be numbers. Received: add,1,a`,
+        message: `Query params "first" and "Second" both should be numbers. Received: ${req.query.params}`,
     });
   });
 });
