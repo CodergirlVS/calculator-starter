@@ -9,9 +9,12 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       );
     }
 
-    const params = extractParams(req.query.params);
+    if (!Array.isArray(req.query.params)) {
+      throw new Error(`Expected multiple params. got: ${req.query.params}`);
+    }
 
-    let result;
+    const params = extractParams(req.query.params);
+    let result: number;
     switch (params.operation) {
       case "add":
         result = add(params.first, params.second);
@@ -29,55 +32,47 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
         throw new Error(`Unsupported operation ${params.operation}`);
     }
     res.status(200).json({ result });
-  } catch (e) {
-    let errMsg = "undefined";
+  } catch (e: any) {
+    let errMsg = "Unknown Error";
     if (e instanceof Error) {
-      errMsg = e.message
+      errMsg = e.message;
     }
     res.status(500).json({ message: errMsg });
   }
 }
-interface QueryParam {
-    operation: string,
-    first: number,
-    second: number,
+
+interface QueryParams {
+  operation: string;
+  first: number;
+  second: number;
 }
 
-type QueryArray = string[] | string | undefined;
-
-function extractParams(queryArray: QueryArray): QueryParam{
-  if(!queryArray) {
+function extractParams(queryParams: string[]): QueryParams {
+  if (queryParams.length !== 3) {
     throw new Error(
-      `Query params should be an Array of String*. Received: ${queryArray}`
+      `Query params should have 3 items. Received ${queryParams.length}: ${queryParams}`
     );
   }
-if(typeof queryArray === 'string') {
-  throw new Error(
-    `Query params should be an Array of String. Received ${queryArray}`
-  );
-}
-
-  if (queryArray?.length !== 3) {
+  if (isNaN(parseInt(queryParams[1])) || isNaN(parseInt(queryParams[2]))) {
     throw new Error(
-      `Query params should have 3 items. Received ${queryArray?.length}: ${queryArray}`
+      `Params "first" and "second" must be numbers. Received: ${queryParams}`
     );
   }
 
   try {
-    const params={
-      operation: queryArray[0],
-      first: parseInt(queryArray[1]),
-      second: parseInt(queryArray[2]),
+    const params = {
+      operation: queryParams[0],
+      first: parseInt(queryParams[1]),
+      second: parseInt(queryParams[2]),
     };
 
-    if(isNaN(params.first) || isNaN(params.second)) {
-      throw new Error(
-        `Query params "first" and "Second" both should be numbers. Received: ${params}`
-      )
-    }
     return params;
-  } catch (e) {
-    throw new Error(`Failed to process query params. Received: ${queryArray}`);
+  } catch (e: any) {
+    let errMsg = `Failed to process query params. Received: ${queryParams}`;
+    if (e instanceof Error) {
+      errMsg = e.message;
+    }
+    throw new Error(errMsg);
   }
 }
 

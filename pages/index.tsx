@@ -1,7 +1,7 @@
 import { Typography, Container, Stack } from "@mui/material";
 import Calculator from "../components/Calculator";
 
-export default function Home() {
+export default function Home(): JSX.Element {
   return (
     <Container maxWidth="sm">
       <Stack>

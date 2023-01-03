@@ -13,31 +13,30 @@ import {
 import { OutlinedInput } from "@mui/material";
 import axios from "axios";
 
-import {
-  useState,
-  ChangeEvent,
-  FormEvent,
-  useRef,
-} from "react";
+import { useState, useRef, ChangeEvent, FormEvent } from "react";
 
-const Calculator = () => {
+const Calculator = (): JSX.Element => {
   const [operation, setOperation] = useState("");
   const [result, setResult] = useState("");
-  const first = useRef<HTMLInputElement>(null);
-  const second = useRef<HTMLInputElement>(null);
+  // const first = useRef<HTMLInputElement>();
+  // const second = useRef<HTMLInputElement>();
 
-  const handleChange = (
-    e: ChangeEvent<HTMLSelectElement>
-  ) => {
+  const handleChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setOperation(e.target.value);
   };
 
+  interface MyForm extends EventTarget {
+    first: HTMLInputElement;
+    second: HTMLInputElement;
+  }
+
   const handleCalculate = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const target = e.target as MyForm;
     const query = {
       operation: operation,
-      first: first.current?.value,
-      second: second.current?.value,
+      first: target.first.value,
+      second: target.second.value,
     };
 
     axios
@@ -105,7 +104,7 @@ const Calculator = () => {
         <Grid2 xs={12}>
           <Box>
             <Paper>
-              <Typography align="center" variant="h3" gutterBottom>
+              <Typography align="center" variant="h3" gutterBottom id="result">
                 {result}
               </Typography>
             </Paper>

@@ -15,7 +15,7 @@ const darkTheme = createTheme({
   },
 });
 
-function MyApp({ Component, pageProps }: AppProps) {
+function MyApp({ Component, pageProps }: AppProps): JSX.Element {
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
