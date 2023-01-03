@@ -53,7 +53,7 @@ function extractParams(queryArray: QueryArray) {
   }
 if(typeof queryArray === 'string') {
   throw new Error(
-    `Query params should be a String Array. Received ${queryArray}`
+    `Query params should not be a String Array. Received ${queryArray}`
   );
 }
 
@@ -63,6 +63,13 @@ if(typeof queryArray === 'string') {
     );
   }
 
+  if(isNaN(parseInt(queryArray[1])) || isNaN(parseInt(queryArray[2])) ) {
+    console.log(queryArray, "QA")
+    throw new Error(
+      `Query params "first" and "Second" both should be numbers. Received: ${queryArray}`
+    )
+  }
+
   try {
     const params: QueryParam = {
       operation: queryArray[0],
@@ -70,11 +77,6 @@ if(typeof queryArray === 'string') {
       second: parseInt(queryArray[2]),
     };
 
-    if(isNaN(params.first) || isNaN(params.second)) {
-      throw new Error(
-        `Query params "first" and "Second" both should be numbers. Received: ${params}`
-      )
-    }
     return params;
   } catch (e) {
     throw new Error(`Failed to process query params. Received: ${queryArray}`);
