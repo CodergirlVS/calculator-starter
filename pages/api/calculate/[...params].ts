@@ -53,11 +53,6 @@ function extractParams(queryParams: string[]): QueryParams {
       `Query params should have 3 items. Received ${queryParams.length}: ${queryParams}`
     );
   }
-  if (isNaN(parseInt(queryParams[1])) || isNaN(parseInt(queryParams[2]))) {
-    throw new Error(
-      `Params "first" and "second" must be numbers. Received: ${queryParams}`
-    );
-  }
 
   try {
     const params = {
@@ -65,6 +60,12 @@ function extractParams(queryParams: string[]): QueryParams {
       first: parseInt(queryParams[1]),
       second: parseInt(queryParams[2]),
     };
+
+    if (isNaN(parseInt(queryParams[1])) || isNaN(parseInt(queryParams[2]))) {
+      throw new Error(
+        `Params "first" and "second" must be numbers. Received: ${queryParams}`
+      );
+    }
 
     return params;
   } catch (e: any) {
