@@ -13,6 +13,15 @@ const darkTheme = createTheme({
   palette: {
     mode: "dark",
   },
+  components: {
+    MuiTooltip: {
+      styleOverrides: {
+        tooltip: {
+          fontSize: "1em",
+        },
+      },
+    },
+  },
 });
 
 function MyApp({ Component, pageProps }: AppProps): JSX.Element {
@@ -25,4 +34,3 @@ function MyApp({ Component, pageProps }: AppProps): JSX.Element {
 }
 
 export default MyApp;
-

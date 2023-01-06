@@ -10,7 +10,8 @@
     "test": "jest --coverage --coverageReporters='text-summary' ",
     "test:e2e": "playwright test",
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "build-storybook": "build-storybook",
+    "test-debug": "node --inspect-brk node_modules/.bin/jest --runInBand --detectOpenHandles"
   },
   "dependencies": {
     "@emotion/react": "^11.10.5",
@@ -47,6 +48,8 @@
     "jest-environment-jsdom": "^29.3.1",
     "node-mocks-http": "^1.12.1",
     "storybook-addon-next": "^1.7.1",
+    "@testing-library/user-event": "^14.4.3",
     "typescript": "^4.9.3"
+    
   }
 }

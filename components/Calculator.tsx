@@ -3,18 +3,18 @@ import {
   Box,
   Paper,
   TextField,
-  MenuItem,
   FormControl,
   NativeSelect,
   Button,
   Divider,
   Typography,
+  Tooltip,
+  OutlinedInput,
 } from "@mui/material";
 import FormHelperText from "@mui/material/FormHelperText";
-import { OutlinedInput } from "@mui/material";
 import axios from "axios";
 
-import { useState, useRef, ChangeEvent, FormEvent } from "react";
+import { useState, useRef, ChangeEvent, FormEvent, useEffect } from "react";
 
 const Calculator = (): JSX.Element => {
   const [operation, setOperation] = useState("");
@@ -22,6 +22,7 @@ const Calculator = (): JSX.Element => {
   const [isFirstError, setIsFirstError] = useState("");
   const [isSecondError, setIsSecondError] = useState("");
   const [isOperationError, setIsOperationError] = useState("");
+  const [disabled, setDisabled] = useState(false);
 
   //const first = useRef<HTMLInputElement>();
   // const second = useRef<HTMLInputElement>();
@@ -30,15 +31,24 @@ const Calculator = (): JSX.Element => {
     setOperation(e.target.value);
   };
 
-  interface MyForm extends EventTarget {
+  interface MyForm extends HTMLFormControlsCollection {
     first: HTMLInputElement;
     second: HTMLInputElement;
   }
 
+  useEffect(() => {
+    if(!isFirstError && !isSecondError && !isOperationError) {
+      setDisabled(false)
+    }
+
+  }, [isFirstError, isSecondError, isOperationError])
+
   const handleCalculate = (e: FormEvent<HTMLFormElement>) => {
-    setResult("");
     e.preventDefault();
-    const target = e.target as MyForm;
+    setDisabled(true);
+    setResult("");
+
+    const target = e.currentTarget.elements as MyForm;
 
     let firstError = "";
     let secondError = "";
@@ -49,7 +59,7 @@ const Calculator = (): JSX.Element => {
       first: target.first.value,
       second: target.second.value,
     };
-
+    console.log("TARGET:", JSON.stringify(query))
     if (isNaN(parseInt(query.first))) {
       firstError = "First is not a number";
     }
@@ -61,11 +71,13 @@ const Calculator = (): JSX.Element => {
     }
 
     if (!firstError && !secondError && !operationError) {
-      console.log("I am here");
       axios
         .get(`/api/calculate/${query.operation}/${query.first}/${query.second}`)
         .then((res) => {
-          setResult(res.data.result);
+          setTimeout(() => {
+            setDisabled(false);
+            setResult(res.data.result);
+          }, 3000);
         })
         .catch((err) => {
           setResult(err.response.data.message);
@@ -88,7 +100,7 @@ const Calculator = (): JSX.Element => {
               error={!!isFirstError}
               helperText={isFirstError}
               //inputRef={first}
-              onFocus={() => setIsFirstError("")}
+              onFocus={() => setIsFirstError("") }
             />
           </FormControl>
         </Grid2>
@@ -130,11 +142,16 @@ const Calculator = (): JSX.Element => {
           </FormControl>
         </Grid2>
         <Grid2 xs={12}>
+        <Tooltip
+              title={disabled && "Waiting for the calculation to be done"}
+              followCursor
+            >
           <FormControl fullWidth>
-            <Button variant="contained" type="submit">
-              Calculate
-            </Button>
+              <Button variant="contained" type="submit" disabled={disabled} >
+                Calculate
+              </Button>
           </FormControl>
+          </Tooltip>
         </Grid2>
         <Grid2 xs={12}>
           <Divider />

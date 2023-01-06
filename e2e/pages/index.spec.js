@@ -110,10 +110,38 @@ test("Result is empty when form error (no api call)", async ({ page }) => {
   await expect(result).toContainText("")
 })
 
-test.only("Error is class on first field", async ({ page }) => {
+test("Error is class on first field", async ({ page }) => {
   await page.goto("/");
   const locator = page.locator("#first")
   await expect(locator).toHaveClass(/MuiOutlinedInput-input/);
 })
 
+// Feature#2 Prevent Double Form Submission TESTs
 
+test("should disable the calculate button when waiting for api response", async ({ page }) => {
+  await page.goto("/")
+  await page.type("#first", "12")
+  await page.type("#second", "2")
+  await page.locator("#operation").selectOption("add")
+
+  await page.click("button[type='submit']")
+
+  const submitButton = await page.locator("button[type='submit']")
+  await expect(submitButton).toBeDisabled();
+})
+
+test("should enable the calculate button when first input field gets focus", async ({ page }) => {
+  await page.goto("/")
+  await page.type("#first", "aa")
+  await page.type("#second", "b")
+  await page.locator("#operation").selectOption("")
+
+  await page.click("button[type='submit']")
+
+  await page.focus("#first")
+  await page.focus('#second')
+  await page.focus('#operation')
+
+  const submitButton = await page.locator("button[type='submit']")
+  await expect(submitButton).toBeEnabled();
+})
