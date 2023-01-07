@@ -1,91 +1,123 @@
-import Grid2 from "@mui/material/Unstable_Grid2";
 import {
   Box,
-  Paper,
-  TextField,
-  FormControl,
-  NativeSelect,
   Button,
   Divider,
+  FormControl,
+  FormHelperText,
+  NativeSelect,
+  Paper,
+  TextField,
+  OutlinedInput,
   Typography,
   Tooltip,
-  OutlinedInput,
 } from "@mui/material";
-import FormHelperText from "@mui/material/FormHelperText";
+import { ChangeEvent, useRef, FormEvent, useState, useEffect } from "react";
+import Grid2 from "@mui/material/Unstable_Grid2";
 import axios from "axios";
+import { useRouter } from "next/router";
 
-import { useState, useRef, ChangeEvent, FormEvent, useEffect } from "react";
+interface InitialValue {
+  initialValue: string[];
+}
 
-const Calculator = (): JSX.Element => {
+const Calculator = ({ initialValue }: InitialValue): JSX.Element => {
   const [operation, setOperation] = useState("");
   const [result, setResult] = useState("");
-  const [isFirstError, setIsFirstError] = useState("");
-  const [isSecondError, setIsSecondError] = useState("");
-  const [isOperationError, setIsOperationError] = useState("");
-  const [disabled, setDisabled] = useState(false);
+  const [firstError, setfirstError] = useState("");
+  const [secondError, setSecondError] = useState("");
+  const [operationError, setOperationError] = useState("");
+  const [isDisabled, setIsDisabled] = useState(false);
+  //const [paramsArray, setParamsArray] = useState<string[]>([]);
 
-  //const first = useRef<HTMLInputElement>();
-  // const second = useRef<HTMLInputElement>();
+  useRef<HTMLInputElement>();
+  const first = useRef<HTMLInputElement>();
+  const second = useRef<HTMLInputElement>();
+  //const operationRef = useRef<HTMLSelectElement>();
+console.log("InitialValue data", initialValue)
+
+  // useEffect(() => {
+  //   if (initialValue?.length === 3) {
+  //     setParamsArray(initialValue);
+  //     setOperation(initialValue[0]);
+  //   }
+  // }, []);
+
+  useEffect(()=>{
+if(initialValue.length) {
+  if(initialValue[0]) {
+    setOperation(initialValue[0])
+   }
+
+    if(first.current && initialValue[1]) {
+       first.current.value = initialValue[1]
+    }
+    if(second.current && initialValue[2]) {
+      second.current.value = initialValue[2]
+   }
+   
+}
+   console.log('use effect is runnig')
+  },[])
 
   const handleChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setOperation(e.target.value);
+    // setOperationError("");
   };
 
   interface MyForm extends HTMLFormControlsCollection {
     first: HTMLInputElement;
     second: HTMLInputElement;
   }
-
-  useEffect(() => {
-    if(!isFirstError && !isSecondError && !isOperationError) {
-      setDisabled(false)
-    }
-
-  }, [isFirstError, isSecondError, isOperationError])
+console.log(operation, "OPS")
+  const isNumeric = (value: string) => {
+    return /^-?\d+$/.test(value);
+  };
 
   const handleCalculate = (e: FormEvent<HTMLFormElement>) => {
+    console.log("I am here")
     e.preventDefault();
-    setDisabled(true);
-    setResult("");
-
     const target = e.currentTarget.elements as MyForm;
-
-    let firstError = "";
-    let secondError = "";
-    let operationError = "";
-
     const query = {
       operation: operation,
       first: target.first.value,
       second: target.second.value,
     };
-    console.log("TARGET:", JSON.stringify(query))
-    if (isNaN(parseInt(query.first))) {
-      firstError = "First is not a number";
-    }
-    if (isNaN(parseInt(query.second))) {
-      secondError = "Second is not a number";
-    }
-    if (query.operation === "") {
-      operationError = "Operation is not selected";
+
+    let error = false;
+
+    if (!isNumeric(query.first)) {
+      setfirstError("Value is not numeric");
+      error = true;
     }
 
-    if (!firstError && !secondError && !operationError) {
+    if (!isNumeric(query.second)) {
+      setSecondError("Value is not numeric");
+      error = true;
+    }
+
+    if (!query.operation) {
+      setOperationError("Choose the operation");
+      error = true;
+    }
+
+    if (!error) {
+      setIsDisabled(true);
+      console.log("clicked");
       axios
         .get(`/api/calculate/${query.operation}/${query.first}/${query.second}`)
         .then((res) => {
-          setTimeout(() => {
-            setDisabled(false);
-            setResult(res.data.result);
-          }, 3000);
+          console.log("SUCCESS ", res)
+          //setTimeout(() => {
+          setResult(res.data.result);
+          setIsDisabled(false);
+          //}, 5000)
         })
         .catch((err) => {
+          console.log("ERR: ", error)
           setResult(err.response.data.message);
+          setIsDisabled(false);
         });
     }
-    setIsFirstError(firstError);
-    setIsSecondError(secondError);
-    setIsOperationError(operationError);
   };
 
   return (
@@ -97,27 +129,28 @@ const Calculator = (): JSX.Element => {
               id="first"
               label="First Number"
               variant="outlined"
-              error={!!isFirstError}
-              helperText={isFirstError}
-              //inputRef={first}
-              onFocus={() => setIsFirstError("") }
+              error={!!firstError}
+              helperText={firstError || ""}
+              onFocus={() => {
+                setfirstError("");
+              }}
+              inputRef={first}
             />
           </FormControl>
         </Grid2>
         <Grid2 xs={2}>
-          <FormControl
-            fullWidth
-            error={!!isOperationError}
-            onFocus={() => setIsOperationError("")}
-          >
+          <FormControl fullWidth>
             <NativeSelect
               input={<OutlinedInput />}
-              defaultValue={""}
+              //defaultValue={""}
+              value={operation || ""}
               inputProps={{
                 name: "operation",
                 id: "operation",
               }}
               onChange={handleChange}
+              error={!!operationError}
+              onFocus={() => setOperationError("")}
             >
               <option value="">Op</option>
               <option value={"add"}>+</option>
@@ -125,7 +158,7 @@ const Calculator = (): JSX.Element => {
               <option value={"multiply"}>*</option>
               <option value={"divide"}>/</option>
             </NativeSelect>
-            <FormHelperText>{isOperationError}</FormHelperText>
+            <FormHelperText>{operationError || ""}</FormHelperText>
           </FormControl>
         </Grid2>
         <Grid2 xs={5}>
@@ -134,24 +167,35 @@ const Calculator = (): JSX.Element => {
               id="second"
               label="Second Number"
               variant="outlined"
-              error={!!isSecondError}
-              helperText={isSecondError}
-              //inputRef={second}
-              onFocus={() => setIsSecondError("")}
+              // value={paramsArray[2] || ""}
+              error={!!secondError}
+              helperText={secondError || ""}
+              onFocus={() => {
+                setSecondError("");
+              }}
+              inputRef={second}
             />
           </FormControl>
         </Grid2>
         <Grid2 xs={12}>
-        <Tooltip
-              title={disabled && "Waiting for the calculation to be done"}
-              followCursor
-            >
           <FormControl fullWidth>
-              <Button variant="contained" type="submit" disabled={disabled} >
-                Calculate
-              </Button>
+            <Tooltip
+              title={isDisabled ? "Waiting for operation response" : ""}
+              placement="top"
+              arrow
+            >
+              <Box style={isDisabled ? { cursor: "progress" } : undefined}>
+                <Button
+                  variant="contained"
+                  type="submit"
+                  // disabled={isDisabled}
+                  fullWidth
+                >
+                  Calculate
+                </Button>
+              </Box>
+            </Tooltip>
           </FormControl>
-          </Tooltip>
         </Grid2>
         <Grid2 xs={12}>
           <Divider />
@@ -159,7 +203,13 @@ const Calculator = (): JSX.Element => {
         <Grid2 xs={12}>
           <Box>
             <Paper>
-              <Typography align="center" variant="h3" gutterBottom id="result">
+              <Typography
+                align="center"
+                variant="h3"
+                gutterBottom
+                id="result"
+                data-testid="result-id"
+              >
                 {result}
               </Typography>
             </Paper>

@@ -5,27 +5,34 @@ import { expect } from "@storybook/jest";
 import Home from "../../pages/index";
 
 export default {
-  title: "Calculator/HomePage",
+  title: "HomePage",
   component: Home,
   parameters: {},
 };
 
-const Template = (args) => <Home />;
+const Template = (args) => <Home {...args}/>;
 
 export const Default = Template.bind({});
 
-export const InteractiveTest = Template.bind({});
+Default.args = {
+  initialValue: []
+  }
+
+  export const InteractiveTest = Template.bind({});
 InteractiveTest.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
-  const form = canvasElement.querySelector("#calculator-form");
+  const form = canvasElement.querySelector("#calculator-form")
   await userEvent.type(form.querySelector("#first"), "1");
   await userEvent.type(form.querySelector("#second"), "2");
   await userEvent.selectOptions(form.querySelector("#operation"), ["add"]);
-
   await userEvent.click(canvas.getByRole("button"));
+  const resultElement = document.querySelector("#result") 
 
-  await waitFor(() => {
-    expect(canvasElement.querySelector("#result").innerText).toBe("3");
+  await waitFor(async () => {
+    console.log("RESULT: ", resultElement?.innerText)
+    // setTimeout( async() => {
+    expect(resultElement?.innerText).toBe("3")
+  //}, 3000) 
   });
 };
 
