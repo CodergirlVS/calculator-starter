@@ -2,8 +2,6 @@ import "../styles/globals.css";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { RouterContext } from "next/dist/shared/lib/router-context";
-
-// import { handlers } from '../mocks/handlers'
 // import { setupWorker, rest } from 'msw';
 
 // //  Storybook executes this module in both bootstrap phase (Node)

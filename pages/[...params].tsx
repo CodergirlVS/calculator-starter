@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 
 const operationsArray: string[] = ["add", "subtract", "multiply", "divide"];
 
-export default function Param(): JSX.Element {
+export default function Calculate(): JSX.Element {
   const router = useRouter();
   const params = router.query.params as string[];
 

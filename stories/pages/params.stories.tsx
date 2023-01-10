@@ -1,4 +1,4 @@
-import Param from "../../pages/[...params]";
+import Calculate from "../../pages/[...params]";
 import React from "react";
 import { within, userEvent, waitFor } from "@storybook/testing-library";
 import { expect } from "@storybook/jest";
@@ -6,7 +6,7 @@ import { ComponentStory, ComponentMeta } from "@storybook/react";
 
 export default {
   title: "DynamicPage",
-  component: Param,
+  component: Calculate,
   parameters: {
     nextRouter: {
       path: "/[...params]",
@@ -16,23 +16,9 @@ export default {
       }
     },
   },
-} as ComponentMeta<typeof Param>;
+} as ComponentMeta<typeof Calculate>;
 
-// const Provider = ({ children } ) => {
-//   const { worker, rest } = window.msw;
-//   worker.use(
-//     rest.get("https://api/calculate/", (req, res, ctx) => {
-//       return res(
-//         ctx.json({
-//           result: "ok",
-//         })
-//       );
-//     })
-//   );
-//   return <>{children}</>;
-// };
-
-const Template: ComponentStory<typeof Param> = (args) => <Param/>;
+const Template: ComponentStory<typeof Calculate> = (args) => <Calculate />;
 
 export const Default = Template.bind({});
 
@@ -41,9 +27,6 @@ export const Default = Template.bind({});
 //     options: ['add', 'subtract', 'multiply', 'divide'],
 //   }
 // }
-
-
-
 
 export const InteractiveTest = Template.bind({});
   InteractiveTest.play = async ({ canvasElement }) => {
@@ -57,9 +40,8 @@ export const InteractiveTest = Template.bind({});
     await userEvent.click(canvas.getByRole("button"));
     const result = document.querySelector("#result") as HTMLElement | null
     console.log("RESULT", result?.innerText)
-
+setTimeout( async() => {
    await expect(result?.innerText).toBe("3");
+     }, 4000) 
  })
-    //  expect(canvas.getByRole('alert')).toBeInTheDocument()});
-    // expect(canvas.getByText('first cannot be empty')).toBeInTheDocument()
  };

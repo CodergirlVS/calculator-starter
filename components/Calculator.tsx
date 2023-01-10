@@ -14,7 +14,6 @@ import {
 import { ChangeEvent, useRef, FormEvent, useState, useEffect } from "react";
 import Grid2 from "@mui/material/Unstable_Grid2";
 import axios from "axios";
-import { useRouter } from "next/router";
 
 interface InitialValue {
   initialValue: string[];
@@ -27,54 +26,41 @@ const Calculator = ({ initialValue }: InitialValue): JSX.Element => {
   const [secondError, setSecondError] = useState("");
   const [operationError, setOperationError] = useState("");
   const [isDisabled, setIsDisabled] = useState(false);
-  //const [paramsArray, setParamsArray] = useState<string[]>([]);
 
   useRef<HTMLInputElement>();
   const first = useRef<HTMLInputElement>();
   const second = useRef<HTMLInputElement>();
-  //const operationRef = useRef<HTMLSelectElement>();
-console.log("InitialValue data", initialValue)
+  const operationRef = useRef<HTMLSelectElement>();
 
-  // useEffect(() => {
-  //   if (initialValue?.length === 3) {
-  //     setParamsArray(initialValue);
-  //     setOperation(initialValue[0]);
-  //   }
-  // }, []);
+  useEffect(() => {
+    if (initialValue.length) {
+      if (initialValue[0]) {
+        setOperation(initialValue[0]);
+      }
 
-  useEffect(()=>{
-if(initialValue.length) {
-  if(initialValue[0]) {
-    setOperation(initialValue[0])
-   }
-
-    if(first.current && initialValue[1]) {
-       first.current.value = initialValue[1]
+      if (first.current && initialValue[1]) {
+        first.current.value = initialValue[1];
+      }
+      if (second.current && initialValue[2]) {
+        second.current.value = initialValue[2];
+      }
     }
-    if(second.current && initialValue[2]) {
-      second.current.value = initialValue[2]
-   }
-   
-}
-   console.log('use effect is runnig')
-  },[])
+  }, []);
 
   const handleChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setOperation(e.target.value);
-    // setOperationError("");
   };
 
   interface MyForm extends HTMLFormControlsCollection {
     first: HTMLInputElement;
     second: HTMLInputElement;
   }
-console.log(operation, "OPS")
+
   const isNumeric = (value: string) => {
     return /^-?\d+$/.test(value);
   };
 
   const handleCalculate = (e: FormEvent<HTMLFormElement>) => {
-    console.log("I am here")
     e.preventDefault();
     const target = e.currentTarget.elements as MyForm;
     const query = {
@@ -102,18 +88,15 @@ console.log(operation, "OPS")
 
     if (!error) {
       setIsDisabled(true);
-      console.log("clicked");
       axios
         .get(`/api/calculate/${query.operation}/${query.first}/${query.second}`)
         .then((res) => {
-          console.log("SUCCESS ", res)
-          //setTimeout(() => {
+          setTimeout(() => {
           setResult(res.data.result);
           setIsDisabled(false);
-          //}, 5000)
+          }, 3000)
         })
         .catch((err) => {
-          console.log("ERR: ", error)
           setResult(err.response.data.message);
           setIsDisabled(false);
         });
@@ -142,8 +125,9 @@ console.log(operation, "OPS")
           <FormControl fullWidth>
             <NativeSelect
               input={<OutlinedInput />}
-              //defaultValue={""}
-              value={operation || ""}
+              defaultValue={operation}
+              //value={operation || ""}
+              ref={operationRef}
               inputProps={{
                 name: "operation",
                 id: "operation",

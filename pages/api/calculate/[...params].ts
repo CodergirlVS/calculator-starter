@@ -12,7 +12,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     if (!Array.isArray(req.query.params)) {
       throw new Error(`Expected multiple params. got: ${req.query.params}`);
     }
-
+    
     const params = extractParams(req.query.params);
     let result: number;
     switch (params.operation) {

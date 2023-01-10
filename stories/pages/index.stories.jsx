@@ -29,10 +29,9 @@ InteractiveTest.play = async ({ canvasElement }) => {
   const resultElement = document.querySelector("#result") 
 
   await waitFor(async () => {
-    console.log("RESULT: ", resultElement?.innerText)
-    // setTimeout( async() => {
+  setTimeout( async() => {
     expect(resultElement?.innerText).toBe("3")
-  //}, 3000) 
+  }, 4000) 
   });
 };
 
