@@ -31,7 +31,7 @@ InteractiveTest.play = async ({ canvasElement }) => {
   await waitFor(async () => {
   setTimeout( async() => {
     expect(resultElement?.innerText).toBe("3")
-  }, 4000) 
+  }, 1000) 
   });
 };
 

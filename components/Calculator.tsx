@@ -91,10 +91,10 @@ const Calculator = ({ initialValue }: InitialValue): JSX.Element => {
       axios
         .get(`/api/calculate/${query.operation}/${query.first}/${query.second}`)
         .then((res) => {
-          setTimeout(() => {
+          //setTimeout(() => {
           setResult(res.data.result);
           setIsDisabled(false);
-          }, 3000)
+          //}, 3000)
         })
         .catch((err) => {
           setResult(err.response.data.message);
@@ -126,7 +126,6 @@ const Calculator = ({ initialValue }: InitialValue): JSX.Element => {
             <NativeSelect
               input={<OutlinedInput />}
               defaultValue={operation}
-              //value={operation || ""}
               ref={operationRef}
               inputProps={{
                 name: "operation",

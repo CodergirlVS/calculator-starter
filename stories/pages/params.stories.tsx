@@ -22,12 +22,6 @@ const Template: ComponentStory<typeof Calculate> = (args) => <Calculate />;
 
 export const Default = Template.bind({});
 
-// Default.args = {
-//   operation: {
-//     options: ['add', 'subtract', 'multiply', 'divide'],
-//   }
-// }
-
 export const InteractiveTest = Template.bind({});
   InteractiveTest.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
@@ -42,6 +36,6 @@ export const InteractiveTest = Template.bind({});
     console.log("RESULT", result?.innerText)
 setTimeout( async() => {
    await expect(result?.innerText).toBe("3");
-     }, 4000) 
+     }, 1000) 
  })
  };
